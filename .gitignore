@@ -1,3 +1,11 @@
+# activity_data.json containing pruned dataset file to json
+
+activity_data.json
+
+# Large dataset
+
+dataset/
+
 .vscode/
 __pycache__/
 venv/
