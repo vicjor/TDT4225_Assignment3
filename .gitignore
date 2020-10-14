@@ -1,3 +1,6 @@
+#Large data files
+dataset/
+
 .vscode/
 __pycache__/
 venv/
