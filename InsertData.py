@@ -3,7 +3,7 @@ from tabulate import tabulate
 import os
 from pprint import pprint
 from dataset import dataset
-# import datetime
+from datetime import datetime
 import json
 # import _pickle as pickle
 import datetime
@@ -51,15 +51,38 @@ class GeolifeProgram:
 
     def insert_users(self):
         Collection = self.db['User']
-        pprint(self.user_ids)
+        # pprint(self.user_ids)
         for user in self.user_ids.items():
-            dictionary = {}
+            dictionary = {} # Must use dictionaries to insert documents in collection
             dictionary["_id"] = user[0]
             dictionary["has_labels"] = user[1]
             Collection.insert_one(dictionary)
             print(user[0], "/ 181")
+        print("========================")
         print("Finished inserting users")
 
+    def insert_activities(self):
+        Collection = self.db['Activity']
+        _id = 0
+        count = 0
+        for user_id, activity_list in self.activity_data.items():
+            print("Queries finished: " + str(count) + "/181")
+            count += 1
+            if(len(activity_list) > 0):
+                for counter, activity in enumerate(activity_list):
+                    _id += 1
+                    dictionary = {}
+                    dictionary["user_id"] = user_id
+                    dictionary["_id"] = _id
+                    if(activity[0][2] != "NULL"):
+                        dictionary["transportation_mode"] = activity[0][2]
+                    dictionary["start_date_time"] = datetime.datetime.strptime(activity[0][5] + " " + activity[0][6], '%Y-%m-%d %H:%M:%S')
+                    dictionary["end_date_time"] = datetime.datetime.strptime(activity[-1][5] + " " + activity[-1][6],
+                                                                      '%Y-%m-%d %H:%M:%S')
+                    Collection.insert_one(dictionary)
+                    print(counter, "/", len(activity_list))
+        print("=============================")
+        print("Finished inserting activities")
 
 
 def main():
@@ -74,8 +97,12 @@ def main():
         # program.print_user_ids()  # Control method to check data is correct ex ('000', False)
         print("Loading from JSON...")
         program.load_activity_data_from_json()
+
         # print("Inserting users to DB")
-        program.insert_users()
+        # program.insert_users()
+
+        # print("Inserting activities to DB")
+        # program.insert_activities()
 
         # print(program.activity_data.get("010"))
         # program.create_activity_table()
