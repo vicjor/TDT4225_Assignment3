@@ -1,3 +1,4 @@
+from typing import Collection
 from DbConnector import DbConnector
 from tabulate import tabulate
 import os
@@ -18,6 +19,7 @@ class GeolifeProgram:
         self.user_ids = {}
         self.labeled_ids = []
         self.activity_data = {}
+        self.trackpoints = []
         self.labeled_data = {}
         self.transportation_modes = ['walk', 'taxi', 'car', 'airplane', 'bike', 'subway', 'bus', 'train', 'other']
 
@@ -85,6 +87,40 @@ class GeolifeProgram:
         print("Finished inserting activities")
 
 
+
+
+    def insert_trackpoints(self):
+        Collection = self.db['TrackPoint']
+
+        _id = 16049
+        count = "000"
+
+        activity_counter = 0
+        for user_id, activity_list in self.activity_data.items():
+            print("User ", count, " of", "181")
+            count = str(int(count) + 1)
+
+            trackpoints = []
+
+            for activity in activity_list:
+                activity_counter += 1
+                act_lst = []
+                for tp in activity:
+                    act = {"_id": _id, "lat": tp[0], "lon": tp[1], "altitude": int(tp[3]), "date_days":tp[4], "date_time": str(tp[5] + " " + tp[6]), "activity_id": activity_counter}
+                    # act["_id"] = _id
+                    # act["lat"] = tp[0]
+                    # act["lon"] = tp[1]
+                    # act["altitude"] = int(tp[3])
+                    # act["date_days"] = tp[4]
+                    # act["date_time"] = str(tp[5] + " " + tp[6])
+
+                    act_lst.append(act)
+                    _id += 1
+                trackpoints += act_lst
+            if (len(trackpoints) > 0):
+                Collection.insert_many(trackpoints)
+        print("Finished inserting trackpoints")
+
 def main():
     program = None
     try:
@@ -103,6 +139,8 @@ def main():
 
         # print("Inserting activities to DB")
         # program.insert_activities()
+        print("Inserting trackpoints...")
+        program.insert_trackpoints()
 
         # print(program.activity_data.get("010"))
         # program.create_activity_table()
