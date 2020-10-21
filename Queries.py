@@ -54,7 +54,15 @@ class Queries:
         for item in query:
             pprint(item)
 
-    #def query6a(self):
+    def query6a(self):
+        query = self.activity.aggregate([
+            {'$project': {'year': {'$year' : '$start_date_time'}}},
+            {'$group': {'_id': '$year', 'count':{'$sum':1}}}, 
+            {'$sort':{'count':-1}},
+            {'$limit':1}
+        ])
+        for item in query:
+            pprint(item)
 
     #def query6b(self):
 
@@ -69,6 +77,7 @@ class Queries:
         #self.query3()
         #self.query4()
         #self.query5()
+        #self.query6a()
 
 if __name__ == "__main__":
     try:
