@@ -37,6 +37,27 @@ class Queries:
         for item in query:
             pprint(item)
 
+    def query4(self): #får ut riktige id'er, men ikke sortert riktig - fikser hvis tid
+        query = self.activity.aggregate([
+            {'$match': {'transportation_mode': 'taxi'}},
+            {'$group': {'_id': '$user_id'}},
+            {'$sort': {'_id':1}}
+        ])
+        for item in query:
+            pprint(item)
+
+    def query5(self):
+        query = self.activity.aggregate([
+            {'$group': {'_id': '$transportation_mode', 'count': {'$sum':1}}},
+            {'$sort': {'_id':1}}, 
+            {'$skip': 1}])
+        for item in query:
+            pprint(item)
+
+    #def query6a(self):
+
+    #def query6b(self):
+
     def main(self):
         #print("User:")
         #self.query1(self.user)
@@ -46,6 +67,8 @@ class Queries:
         #self.query1(self.trackpoint)
         #self.query2()
         #self.query3()
+        #self.query4()
+        #self.query5()
 
 if __name__ == "__main__":
     try:
