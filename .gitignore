@@ -1,6 +1,13 @@
+
+# activity_data.json containing pruned dataset file to json
+
+activity_data.json
+
+
 #Large data files
 dataset/
 
 .vscode/
 __pycache__/
 venv/
+.DS_Store
