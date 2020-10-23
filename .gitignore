@@ -1,9 +1,10 @@
+
 # activity_data.json containing pruned dataset file to json
 
 activity_data.json
 
-# Large dataset
 
+#Large data files
 dataset/
 
 .vscode/

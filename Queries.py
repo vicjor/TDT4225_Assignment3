@@ -10,7 +10,7 @@ class Queries:
     def __init__(self):
         self.connection = DbConnector()
         self.client = self.connection.client
-        self.db = self.connection.db 
+        self.db = self.connection.db
         self.activity = self.db['Activity']
         self.user = self.db['User']
         self.trackpoint = self.db['TrackPoint']
@@ -21,7 +21,7 @@ class Queries:
         #count_activities = db.Activity.find({}).count()
         print(count)
 
-    def query2(self): 
+    def query2(self):
         activity = self.activity.count_documents({})
         user = self.user.count_documents({})
         avg = activity / user
@@ -29,10 +29,10 @@ class Queries:
 
     def query3(self):
         query = self.activity.aggregate([
-            {'$group': {'_id': '$user_id', 
+            {'$group': {'_id': '$user_id',
                 'count': { '$sum': 1}
                 }
-            }, 
+            },
             {'$sort': {'count':-1}},
             {'$limit': 20}
         ])
@@ -51,12 +51,20 @@ class Queries:
     def query5(self):
         query = self.activity.aggregate([
             {'$group': {'_id': '$transportation_mode', 'count': {'$sum':1}}},
-            {'$sort': {'_id':1}}, 
+            {'$sort': {'_id':1}},
             {'$skip': 1}])
         for item in query:
             pprint(item)
 
-    #def query6a(self):
+    def query6a(self):
+        query = self.activity.aggregate([
+            {'$project': {'year': {'$year' : '$start_date_time'}}},
+            {'$group': {'_id': '$year', 'count':{'$sum':1}}},
+            {'$sort':{'count':-1}},
+            {'$limit':1}
+        ])
+        for item in query:
+            pprint(item)
 
     #def query6b(self):
 
@@ -127,7 +135,7 @@ class Queries:
                     totInvalidActivities[item['user_id']] = totInvalidActivities.get(item['user_id'], 0) + 1
                     break
 
-        print('Query 9: Total number of invalid activities: ')        
+        print('Query 9: Total number of invalid activities: ')
 
         for user in totInvalidActivities:
             pprint(user)
@@ -192,6 +200,7 @@ class Queries:
         #self.query3()
         #self.query4()
         #self.query5()
+        #self.query6a()
         self.query8()
         self.query9()
         #self.query10()
@@ -205,7 +214,7 @@ if __name__ == '__main__':
         print(e)
 
 
-''' 
+'''
 def main():
     program = None
     try:
