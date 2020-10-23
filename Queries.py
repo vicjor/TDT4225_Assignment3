@@ -71,42 +71,25 @@ class Queries:
     def query8(self):
         query = self.activity.aggregate([
             {
-                '$match': {
-                    'trackpoints.altitude': {'$ne': '-777'}
-                }
-            },
-            {
                 '$lookup': {
                     'from': 'TrackPoint',
                     'localField': '_id',
                     'foreignField': 'activity_id',
                     'as': 'trackpoints'
                 }
-            }, {
+            },
+            {
                 '$project': {
-                    'trackpoints.altitude': 1,
-                    'user_id': 1
+                    '_id': '$_id',
+                    'user_id': '$user_id',
+                    'trackpoints.altitude': '$trackpoints.altitude',
+
                 }
             }])
+        print('Query 8: highest total altitude: ')
 
-        totAltitude = {}
         for item in query:
-            gainedHight = item['trackpoints']
-            res = 0
-
-            for i in range(len(gainedHight) - 1):
-                if gainedHight[i]['altitude'] == '-777':
-                    continue
-
-                if float(gainedHight[i]['altitude']) < float(gainedHight[i + 1]['altitude']):
-                    res += (float(gainedHight[i + 1]['altitude']) - float(gainedHight[i]['altitude'])) * 0.3048
-
-            totAltitude[item['user_id']] = totAltitude.get(item['user_id'], 0) + res
-
-        print('Query 8: Top 20 users that gained most altitude: ')
-
-        for user in totAltitude:
-            pprint(user)
+            pprint(item)
 
     def query9(self):
         query = self.activity.aggregate([
@@ -120,24 +103,16 @@ class Queries:
             },
             {
                 '$project': {
-                    'trackpoints.date_days': 1,
-                    'user_id': 1
+                    'trackpoints.date_days': '$trackpoints.date_days',
+                    'user_id': '$user_id',
+                    '_id': '$_id'
                 }
             }])
 
-        totInvalidActivities = {}
-
-        for item in query:
-            invalidActivity = item['trackpoints']
-
-            for i in range(len(invalidActivity) - 1):
-                if float(invalidActivity[i + 1]['date_days']) - float(invalidActivity[i]['date_days']) >= 0.00347222:
-                    totInvalidActivities[item['user_id']] = totInvalidActivities.get(item['user_id'], 0) + 1
-                    break
 
         print('Query 9: Total number of invalid activities: ')
 
-        for user in totInvalidActivities:
+        for user in query:
             pprint(user)
 
     def query10(self):
@@ -201,7 +176,7 @@ class Queries:
         #self.query4()
         #self.query5()
         #self.query6a()
-        self.query8()
+        #self.query8()
         self.query9()
         #self.query10()
         #self.query11()
