@@ -18,7 +18,6 @@ class Queries:
 
     def query1(self, collection):
         count = collection.count_documents({})
-        #count_activities = db.Activity.find({}).count()
         print(count)
 
     def query2(self):
@@ -39,7 +38,7 @@ class Queries:
         for item in query:
             pprint(item)
 
-    def query4(self): #får ut riktige id'er, men ikke sortert riktig - fikser hvis tid
+    def query4(self):
         query = self.activity.aggregate([
             {'$match': {'transportation_mode': 'taxi'}},
             {'$group': {'_id': '$user_id'}},
@@ -66,7 +65,32 @@ class Queries:
         for item in query:
             pprint(item)
 
-    #def query6b(self):
+    def query6b(self):
+        query = self.activity.aggregate([
+            {'$project': {'year': {'$year' : '$start_date_time'},
+                'activity_hours' : {'$divide' :
+                    [{'$subtract' :['$end_date_time', '$start_date_time']},
+                    3600000]}}},
+            {'$group' :{'_id': '$year', 'hours': {'$sum': '$activity_hours'}}},
+            {'$sort': {'hours': -1}},
+            {'$limit':1}
+        ])
+
+        for item in query:
+            pprint(item)
+
+    def query7(self):
+        id_query = self.activity.find({
+            'user_id': '112',
+            'start_date_time': '/^2008/'
+        })
+
+        query = self.activity.aggregate([
+            {'$match': {'transportation_mode': 'walk', 'user_id':'112'}},
+            {'$project': {'year': {'$year' : '$start_date_time'}}},
+            #få ut kun 2008
+        ])
+        #regne ut km vha TrackPoint
 
     def query8(self):
         query = self.activity.aggregate([
@@ -177,9 +201,10 @@ class Queries:
         #self.query5()
         #self.query6a()
         #self.query8()
-        self.query9()
+        #self.query9()
         #self.query10()
         #self.query11()
+
 
 if __name__ == '__main__':
     try:
