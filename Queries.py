@@ -80,18 +80,30 @@ class Queries:
             pprint(item)
 
     def query7(self):
-        id_query = self.activity.find({
-            'user_id': '112',
-            'start_date_time': '/^2008/'
-        })
-
         query = self.activity.aggregate([
-            {'$match': {'transportation_mode': 'walk', 'user_id':'112'}},
-            {'$project': {'year': {'$year' : '$start_date_time'}}},
-            #få ut kun 2008
-        ])
-        #regne ut km vha TrackPoint
+            {'$match': {
+                '$and': [{'transportation_mode': 'walk'}, {'user_id':'112'}, 
+                {'$expr': {'$and': [{'$year': '$end_date_time'}, '2008']}}]}},
+            {'$lookup': {
+                'from': 'TrackPoint',
+                'localField': '_id',
+                'foreignField': 'activity_id',
+                'as': 'trackpoints'
+                }
+            },
+            {'$project': {'lat': '$trackpoints.lat', 'lon': '$trackpoints.lon'}} 
 
+        ])
+        distance_walked = 0
+        for item in query:
+            lon = item['lon']
+            lat = item['lat']
+            #regn ut distansen for denne aktiviteten
+            for i in range(0,len(lon)-1):
+                distance_walked += haversine(lat[i], lon[i], unit='km') 
+        print("Total distance: ", round(distance_walked, 1), " km")
+    
+        
     def query8(self):
         query = self.activity.aggregate([
             {
@@ -200,6 +212,8 @@ class Queries:
         #self.query4()
         #self.query5()
         #self.query6a()
+        #self.query6b()
+        self.query7()
         #self.query8()
         #self.query9()
         #self.query10()
